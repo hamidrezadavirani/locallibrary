@@ -41,14 +41,12 @@ class Book(models.Model):
         return ', '.join(genre.name for genre in self.genre.all()[:3])
 
 
-import uuid  # Required for unique book instances
-
+import uuid # Required for unique book instances
 
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,
-                          help_text='Unique ID for this particular book across whole library')
-    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True, related_name='samenames')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular book across whole library')
+    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
 
@@ -67,18 +65,16 @@ class BookInstance(models.Model):
         help_text='Book availability',
     )
 
-    def get_book_name(self):
-        # Calm down
-        print()
-        return self.book.title
-        # return Book.objects.filter(id=self.book.id).first()
-
     class Meta:
-        ordering = ['-status']
+        ordering = ['due_back']
 
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.id} ({self.book.title})'
+
+    def get_book_name(self):
+        return self.book.title
+        # return Book.objects.filter(id=self.book.id).first()
 
 
 class Author(models.Model):
